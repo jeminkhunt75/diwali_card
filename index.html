@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Diwali Post</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous">
+        <style>
+            .text-container {
+                position: absolute;
+                left: 32%;
+                top: 16rem;
+                width: 180px;
+            }
+            img {
+                height: 100%;
+                width: 100%;
+            }
+
+            .image_preview {
+                position: absolute;
+                top: -176px;
+                left: 0px;
+                width: 100%;
+                height: 100%;
+            }
+            .image_preview img{
+                width: 100%;
+                height: 100%;
+                max-width: 151px;
+                max-height: 166px;
+                min-height: 166px;
+                border-radius: 10px;
+            }
+
+            .text_color_input {
+                color: #701136;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="container text-center mt-3" style=" float: left;
+        margin: 3px;
+        padding: 3px;
+        width: 500px;
+        height: 500px;">
+            <div id="html-content-holder" style="color: #701136; position: relative;">
+                <img src="Diwali-Post-PNG.png" alt="" srcset="">
+                <div class="text-container">
+                    <h6 class="m-0 name_here"></h6>
+                    <p class="company_name"></p>
+                    <div id="imagePreview" class="image_preview">
+                        <img class="imagePreviewShow" src="image_default.png" alt="" class="img-fluid"> 
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 mx-auto my-3 text-start">
+                <div class="mb-2">
+                    <label for="your_name_input" class="form-label text_color_input">Your Name*</label>
+                    <input type="text" class="form-control" id="your_name_input" placeholder="Your Name">
+                    <p class="text-danger your_name_validation d-none"></p>
+                </div>
+                <div class="mb-3">
+                    <label for="your_company_name_input" class="form-label text_color_input">Your Company Name</label>
+                    <input type="text" class="form-control" id="your_company_name_input" placeholder="Your Company Name">
+                </div>
+                <div class="mb-3">
+                    <label for="formFileSm" class="form-label text_color_input">Upload Your Photo</label>
+                    <input class="form-control file-input" id="formFileMd" type="file" accept="image/*">
+                    <p class="text-danger your_file_validation d-none"></p>
+                  </div>
+                <!-- <button class="btn btn-primary" style="background-color: #701136; border: none;" type="button">Upload Your Photo</button> -->
+                <button class="btn btn-primary download_post mb-3" style="background-color: #701136; border: none;" type="button">Download Image</button>
+            </div>
+        </div>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+        <script>
+            $(document).ready(function() {
+               
+                $(document).on('keyup', '#your_name_input',function() {
+                    var your_name_input = $(this).val();
+                    $('.name_here').html(your_name_input);
+                });
+
+                $(document).on('keyup', '#your_company_name_input',function() {
+                    var your_company_name_input = $(this).val();
+                    $('.company_name').html(your_company_name_input);
+                });
+
+                $('.file-input').change(function(){
+                    var curElement = $('.imagePreviewShow');
+                    console.log(curElement);
+                    var reader = new FileReader();
+                
+                    reader.onload = function (e) {
+                        curElement.attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                });
+
+                $(document).on('click', '.download_post',function() {
+                    var your_name_input = $('#your_name_input').val();
+                    var your_company_name_input = $('#your_company_name_input').val();
+                    var file_input = $('.file-input').val();
+                    $('.your_name_validation').addClass('d-none');
+                    $('.your_file_validation').addClass('d-none');
+
+                    if(your_name_input == '') {
+                        $('.your_name_validation').html('Please Enter a Name').removeClass('d-none');
+                    }
+
+                    
+                    if(file_input == '') {
+                        $('.your_file_validation').html('Please Upload Profile image.').removeClass('d-none');
+                    }
+
+                    if (your_name_input != '' && file_input != '') {
+                        var element = $("#html-content-holder");
+                        saveCapture(element)
+                    }
+
+                });
+
+                function saveCapture(element) {
+                    html2canvas(element).then(function(canvas) {
+                      download(canvas.toDataURL("image/png"));
+                    })
+                  }
+
+                  function download(url){
+                    var your_name_input = $('#your_name_input').val();
+                    var a = $("<a style='display:none' id='js-downloder'>")
+                    .attr("href", url)
+                    .attr("download", your_name_input+"_diwali_card.png")
+                    .appendTo("body");    
+                    a[0].click();
+                    a.remove();
+                  }
+            });
+        </script>
+    </body>
+</html>
