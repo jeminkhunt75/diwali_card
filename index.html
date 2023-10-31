@@ -9,6 +9,8 @@
             rel="stylesheet"
             integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
             crossorigin="anonymous">
+            <link rel="stylesheet" href="./croppie.css">
+            <script src="./croppie.js"></script>
         <style>
             .text-container {
                 position: absolute;
@@ -16,7 +18,7 @@
                 top: 16rem;
                 width: 180px;
             }
-            img {
+            img.img {
                 height: 100%;
                 width: 100%;
             }
@@ -50,7 +52,7 @@
         width: 500px;
         height: 500px;">
             <div id="html-content-holder" style="color: #701136; position: relative;">
-                <img src="Diwali-Post-PNG.png" alt="" srcset="">
+                <img class="img" src="Diwali-Post-PNG.png" alt="" srcset="">
                 <div class="text-container">
                     <h6 class="m-0 name_here"></h6>
                     <p class="company_name"></p>
@@ -75,9 +77,33 @@
                     <p class="text-danger your_file_validation d-none"></p>
                   </div>
                 <!-- <button class="btn btn-primary" style="background-color: #701136; border: none;" type="button">Upload Your Photo</button> -->
-                <button class="btn btn-primary download_post mb-3" style="background-color: #701136; border: none;" type="button">Download Image</button>
-            </div>
+                <button class="btn btn-primary download_post mb-3" style="background-color: #701136; border: none;" type="button">Download Image</button>     
+                
+             </div>
         </div>
+
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Crop Image</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" class="image_data" value="0">
+                    <div id="croppie">
+                        <img src="" alt="">
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" id="upload" class="btn btn-primary">Upload</button>
+                </div>
+              </div>
+            </div>
+          </div>
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
@@ -89,6 +115,8 @@
         <script>
             $(document).ready(function() {
                
+
+            let croppie;
                 $(document).on('keyup', '#your_name_input',function() {
                     var your_name_input = $(this).val();
                     $('.name_here').html(your_name_input);
@@ -100,20 +128,36 @@
                 });
 
                 $('.file-input').change(function(){
-                    var curElement = $('.imagePreviewShow');
-                    console.log(curElement);
-                    var reader = new FileReader();
-                
-                    reader.onload = function (e) {
-                        curElement.attr('src', e.target.result);
-                    };
-                    reader.readAsDataURL(this.files[0]);
+                    if (this.files && this.files[0]) {
+                        $('#exampleModal').modal('show');
+                        let reader = new FileReader();
+                        reader.onload = function(e) {
+                          $('#croppie img').attr('src', e.target.result);
+                          croppie = new Croppie($('#croppie img')[0], {
+                            boundary: { width: 300, height: 300 },
+                            viewport: { width: 151, height: 166 }
+                          })
+                        }
+                        $('#upload').show();
+                        $('#upload').on('click', function() {
+                            $('#exampleModal').modal('hide');
+                            $('.image_data').val(1);
+                          croppie
+                             .result({ type: 'base64', circle: false })
+                             .then(function(dataImg) {
+                                var data = [{ image: dataImg }, { name: 'myimgage.jpg' }];
+                                $('.imagePreviewShow').attr('src', dataImg);
+                             });
+                        });
+                        reader.readAsDataURL(this.files[0]);
+                      }
                 });
 
                 $(document).on('click', '.download_post',function() {
                     var your_name_input = $('#your_name_input').val();
                     var your_company_name_input = $('#your_company_name_input').val();
                     var file_input = $('.file-input').val();
+                    var image_data = $('.image_data').val();
                     $('.your_name_validation').addClass('d-none');
                     $('.your_file_validation').addClass('d-none');
 
@@ -122,11 +166,11 @@
                     }
 
                     
-                    if(file_input == '') {
+                    if(image_data == 0) {
                         $('.your_file_validation').html('Please Upload Profile image.').removeClass('d-none');
                     }
 
-                    if (your_name_input != '' && file_input != '') {
+                    if (your_name_input != '' && image_data == 1) {
                         var element = $("#html-content-holder");
                         saveCapture(element)
                     }
@@ -147,6 +191,7 @@
                     .appendTo("body");    
                     a[0].click();
                     a.remove();
+                    location.reload(true)
                   }
             });
         </script>
